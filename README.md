@@ -1,2 +1,2 @@
-# PADC-SFC-News-Room
-Room setup
+# PADC-SFC-News
+Walk-through on Android Seven Fundamental Components.
