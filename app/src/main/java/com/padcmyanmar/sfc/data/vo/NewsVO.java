@@ -14,7 +14,13 @@ import java.util.List;
 /**
  * Created by aung on 12/2/17.
  */
-@Entity(tableName = "News")
+@Entity(tableName = "News", foreignKeys = {
+        @ForeignKey(
+                entity = PublicationVO.class,
+                parentColumns = "publicationId",
+                childColumns = "publicationId",
+                onDelete = ForeignKey.CASCADE
+        )})
 public class NewsVO {
 
     @PrimaryKey

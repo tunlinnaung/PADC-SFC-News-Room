@@ -4,7 +4,13 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 
-@Entity(tableName = "NewsInImage")
+@Entity(tableName = "NewsInImage", foreignKeys = {
+        @ForeignKey(
+                entity = NewsVO.class,
+                parentColumns = "newsId",
+                childColumns = "newsId",
+                onDelete = ForeignKey.CASCADE
+        )})
 public class NewsInImageVO {
 
     @PrimaryKey(autoGenerate = true)

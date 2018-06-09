@@ -17,6 +17,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,21 +28,22 @@ public class NewsModel extends ViewModel {
 
     private AppDatabase mAppDatabase;
 
-    private LiveData<List<NewsVO>> mNews;
+    private List<NewsVO> mNews;
 
     private int mmNewsPageIndex = 1;
 
     public NewsModel() {
         EventBus.getDefault().register(this);
+        mNews = new ArrayList<>();
     }
 
     public void initDatabase(Context context) {
         mAppDatabase = AppDatabase.getNewsDatabase(context);
     }
 
-    public LiveData<List<NewsVO>> getNews() {
-        return mAppDatabase.newsDao().getAllNews();
-    }
+//    public LiveData<List<NewsVO>> getNews() {
+//        return mAppDatabase.newsDao().getAllNews();
+//    }
 
     public void startLoadingMMNews() {
         MMNewsDataAgentImpl.getInstance().loadMMNews(AppConstants.ACCESS_TOKEN, mmNewsPageIndex);
@@ -58,8 +60,8 @@ public class NewsModel extends ViewModel {
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onNewsDataLoaded(RestApiEvents.NewsDataLoadedEvent event) {
-        //mNews.addAll(event.getLoadNews());
-        //mmNewsPageIndex = event.getLoadedPageIndex() + 1;
+        mNews.addAll(event.getLoadNews());
+        mmNewsPageIndex = event.getLoadedPageIndex() + 1;
 
         mAppDatabase.actedUserDao().deleteAll();
         mAppDatabase.commentActionDao().deleteAll();
@@ -71,8 +73,11 @@ public class NewsModel extends ViewModel {
 
         List<NewsVO> newsVOs = event.getLoadNews();
         for (NewsVO newsVO : newsVOs) {
-            mAppDatabase.newsInImageDao().insertImageWithNews(newsVO);
             mAppDatabase.publicationDao().insertPublication(newsVO.getPublication());
+
+            mAppDatabase.newsDao().insertNewsWithPubId(newsVO.getPublication().getPublicationId(), newsVO);
+
+            mAppDatabase.newsInImageDao().insertImageWithNews(newsVO);
 
             if (newsVO.getCommentActions() != null) {
                 for (CommentActionVO commentActionVO : newsVO.getCommentActions()) {
@@ -102,8 +107,6 @@ public class NewsModel extends ViewModel {
                             sentToVO);
                 }
             }
-
-            mAppDatabase.newsDao().insertNewsWithPubId(newsVO.getPublication().getPublicationId(), newsVO);
 
         }
 

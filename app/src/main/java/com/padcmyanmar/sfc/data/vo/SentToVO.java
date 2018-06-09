@@ -11,7 +11,25 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by aung on 12/3/17.
  */
-@Entity(tableName = "SendTo")
+@Entity(tableName = "SendTo", foreignKeys = {
+        @ForeignKey(
+                entity = NewsVO.class,
+                parentColumns = "newsId",
+                childColumns = "newsId",
+                onDelete = ForeignKey.CASCADE
+        ),
+        @ForeignKey(
+                entity = ActedUserVO.class,
+                parentColumns = "userId",
+                childColumns = "senderUserId",
+                onDelete = ForeignKey.CASCADE
+        ),
+        @ForeignKey(
+                entity = ActedUserVO.class,
+                parentColumns = "userId",
+                childColumns = "receiverUserId",
+                onDelete = ForeignKey.CASCADE
+        )})
 public class SentToVO {
 
     @PrimaryKey

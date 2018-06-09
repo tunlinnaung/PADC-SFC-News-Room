@@ -102,12 +102,12 @@ public class NewsListActivity extends BaseActivity
 
         newsModel = ViewModelProviders.of(this).get(NewsModel.class);
         newsModel.initDatabase(getApplicationContext());
-        newsModel.getNews().observe(this, new Observer<List<NewsVO>>() {
-            @Override
-            public void onChanged(@Nullable List<NewsVO> newsVOs) {
-                mNewsAdapter.setNewData(newsVOs);
-            }
-        });
+//        newsModel.getNews().observe(this, new Observer<List<NewsVO>>() {
+//            @Override
+//            public void onChanged(@Nullable List<NewsVO> newsVOs) {
+//                mNewsAdapter.setNewData(newsVOs);
+//            }
+//        });
     }
 
     @Override
@@ -179,7 +179,7 @@ public class NewsListActivity extends BaseActivity
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onNewsDataLoaded(RestApiEvents.NewsDataLoadedEvent event) {
-        //mNewsAdapter.appendNewData(event.getLoadNews());
+        mNewsAdapter.appendNewData(event.getLoadNews());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

@@ -32,7 +32,7 @@ import com.padcmyanmar.sfc.data.vo.SentToVO;
 @Database(entities = {
                        NewsVO.class, NewsInImageVO.class, PublicationVO.class, ActedUserVO.class,
                        CommentActionVO.class, FavoriteActionVO.class, SentToVO.class
-                     }, version = 9, exportSchema = false)
+                     }, version = 12, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static final String DB_NAME = "PADC-MMNEWS-AC.DB";
