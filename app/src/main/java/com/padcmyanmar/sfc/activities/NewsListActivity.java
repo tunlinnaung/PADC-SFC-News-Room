@@ -10,10 +10,12 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.padcmyanmar.sfc.R;
 import com.padcmyanmar.sfc.SFCNewsApp;
@@ -33,9 +35,17 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Single;
+import io.reactivex.SingleObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 
 public class NewsListActivity extends BaseActivity
         implements NewsItemDelegate {
@@ -54,6 +64,8 @@ public class NewsListActivity extends BaseActivity
     private NewsAdapter mNewsAdapter;
 
     private NewsModel newsModel;
+
+    private PublishSubject<List<NewsVO>> mNewsSubject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +120,91 @@ public class NewsListActivity extends BaseActivity
 //                mNewsAdapter.setNewData(newsVOs);
 //            }
 //        });
+
+        mNewsSubject = PublishSubject.create();
+        mNewsSubject.subscribe(new io.reactivex.Observer<List<NewsVO>>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(@NonNull List<NewsVO> news) {
+                Log.d(SFCNewsApp.LOG_TAG, "onNext: " + news.size());
+                mNewsAdapter.appendNewData(news);
+
+                processPrimeSingle();
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+
+
+        newsModel.initPublishSubject(mNewsSubject);
+        newsModel.startLoadingMMNews();
+    }
+
+    private void processPrimeSingle() {
+        Single<String> primeSingle = Single.fromCallable(new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                int[] numbers = new int[] { 2, 5, 10, 15, 20, 131 };
+                return calculatePrime(numbers);
+            }
+        });
+
+        primeSingle
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<String>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(@NonNull String primeStr) {
+                        Toast.makeText(NewsListActivity.this, "Prime number : " + primeStr, Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+
+                    }
+                });
+    }
+
+    private String calculatePrime(int... numbers) {
+        String  primeNumbers = "";
+
+        for (int i = 0; i < numbers.length; i++) {
+            if (numbers[i] == 2 || isPrime(numbers[i])) {
+                primeNumbers = primeNumbers + numbers[i] + ", ";
+            }
+        }
+
+        if (!TextUtils.isEmpty(primeNumbers) && primeNumbers.contains(",")) {
+            primeNumbers = primeNumbers.substring(0, primeNumbers.lastIndexOf(","));
+        }
+
+        return primeNumbers;
+    }
+
+    private boolean isPrime(int number) {
+        for (int i = 2; i < number; i++) {
+            if (number % i == 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
