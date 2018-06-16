@@ -148,15 +148,14 @@ public class NewsListActivity extends BaseActivity
         });
 
 
-        newsModel.initPublishSubject(mNewsSubject);
-        newsModel.startLoadingMMNews();
+        newsModel.startLoadingMMNews(mNewsSubject);
     }
 
     private void processPrimeSingle() {
         Single<String> primeSingle = Single.fromCallable(new Callable<String>() {
             @Override
             public String call() throws Exception {
-                int[] numbers = new int[] { 2, 5, 10, 15, 20, 131 };
+                int[] numbers = new int[] { 2, 5, 9, 10, 15, 20, 131 };
                 return calculatePrime(numbers);
             }
         });
